@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title> Your Album </title>
+    <meta charset="UTF-8">
+    <meta name="description" content="Project for Lab 6 of CS 252">
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
+</head>
+<body onload="handleFiles()">
+    <h1 id="albumname">Album</h1>
+    <br>
+    <output id="list"></output>
+    <p hidden id="path"><%=url%></p>
+    <p hidden id="count"><%=count%></p>
+    
+    <script>
+        function handleFiles() {
+            var ext = window.location.href;
+            var key = ext.substr(ext.lastIndexOf('/') + 1);
+            $.ajax({
+                url: '/tget/'+key,
+                type: 'GET',
+                success: function(data) {
+                    document.getElementById('albumname').innerHTML = data;
+                },
+                error: function(response) {
+                    document.getElementById('albumname').innerHTML = "404";
+                }
+            });
+            for (var i = 0; i < document.getElementById('count').innerHTML; i++) {
+                $.ajax({
+                    url: '/get/'+key+'/'+i,
+                    type: 'GET',
+                    success: function(data) {
+                        //console.log("kkk"+document.getElementById('values').innerHTML);
+                        var img = document.createElement('img');
+                        img.src = data;
+                        console.log(data);
+                        document.body.appendChild(img);
+                    },
+                    error: function(response) {
+                        alert("Looks like there's nothing here.");
+                    }
+                });
+                // Loop through the FileList and render image files as thumbnails.
+            }
+        }
+        
+    </script>
+</body>

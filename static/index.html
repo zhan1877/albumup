@@ -1,0 +1,110 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<title> CS 252 Lab 6 </title>
+	<meta charset="UTF-8">
+	<meta name="description" content="Project for Lab 6 of CS 252">
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
+</head>
+<body>
+	<h1>Album Create</h1>
+	<p> Please pick a URL for your images. </p>
+	<p>URL Extension: </p>
+	<input type="text" id="extension" value="">
+	<input type="submit" id="check" value="Check Availability" onclick="submitFiles()"><br>
+	<br>
+	<input type="file" id="input" multiple>
+	<output id="list"></output>
+	<br>
+	<br>
+	<p>Album Name:</p>
+	<input type="text" id="album" value="">
+    <input type="submit" id="finalize" value="Submit" onclick="finishAlbum()">
+	<br>
+	
+	<script>
+		function handleFiles(evt) {
+			var files = evt.target.files;
+            dbarray = [];
+		    // Loop through the FileList and render image files as thumbnails.
+		    for (var i = 0, f; f = files[i]; i++) {
+
+		    	// Only process image files.
+		    	if (!f.type.match('image.*')) {
+		    		continue;
+		    	}
+
+		    	var reader = new FileReader();
+		      	// Closure to capture the file information.
+		      	reader.onload = (function(theFile) {
+		      		return function(e) {
+		          	// Render thumbnail.
+		          	var span = document.createElement('span');
+		          	span.innerHTML = 
+		          	[
+		          	'<img style="height: 75px; border: 1px solid #000; margin: 5px" src="', 
+		          	e.target.result,
+		          	'" title="', escape(theFile.name), 
+		          	'"/>'
+		          	].join('');
+		            console.log(e.target.result);
+                    dbarray.push(e.target.result);
+		          	document.getElementById('list').insertBefore(span, null);
+		      		};
+		  		})(f);
+
+		      // Read in the image file as a data URL.
+		    	reader.readAsDataURL(f);
+			}
+		}
+		document.getElementById('input').addEventListener('change', handleFiles, false);
+		function submitFiles() {
+			var key = document.getElementById('extension').value;
+            $.ajax({
+                url: '/check/'+key,
+                type: 'GET',
+                success: function(response) {
+                    alert("URL Available");
+                },
+                error: function(response) {
+                    alert("URL Unavailable");
+                }
+            });
+		}
+        function finishAlbum() {
+            if (dbarray.length == 0) {
+                alert("Must upload at least one photo");
+            } else {
+                var key = document.getElementById('extension').value;
+                var title = document.getElementById('album').value;
+                $.ajax({
+                    url: '/tsave/'+key+'/'+title,
+                    type: 'POST',
+                    success: function(response) {
+                        for (var i = 0; i < dbarray.length; i++) {
+                            $.ajax({
+                                url: '/save/'+key+'/'+i,
+                                type: 'POST',
+                                data: {
+                                    'data': dbarray[i]
+                                },
+                                success: function(response) {
+                                    alert("Success!");
+                                },
+                                error: function(response) {
+                                    alert("Error saving photos");
+                                }
+                            });
+                        }
+                        window.location.href='http://massiveurl.albert.tech:7654/results/'+key;
+                    },
+                    error: function(response) {
+                        alert("Error saving photos");
+                    }
+                });
+            }
+        }
+	</script>
+</body>
+</html>
+

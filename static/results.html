@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title> Your Album </title>
+    <meta charset="UTF-8">
+    <meta name="description" content="Project for Lab 6 of CS 252">
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
+</head>
+<body onload="handleFiles()">
+    <h1>Album</h1>
+    <br>
+    <output id="list"></output>
+    
+    <script>
+        function handleFiles() {
+            var ext = window.location.href;
+            var key = ext.substr(ext.lastIndexOf('/') + 1));
+            $.ajax({
+                url: '/get/'+key,
+                type: 'GET',
+                success: function(data) {
+                    console.log(data);
+                    var files = data;
+                },
+                error: function(response) {
+                    alert("Looks like there's nothing here.");
+                }
+            });
+            // Loop through the FileList and render image files as thumbnails.
+            for (var i = 0, f; f = files[i]; i++) {
+                    // Render thumbnail.
+                    var span = document.createElement('span');
+                    span.innerHTML = 
+                    [
+                    '<img style="height: 75px; border: 1px solid #000; margin: 5px" src="', 
+                    f,
+                    '" title="', escape(i), 
+                    '"/>'
+                    ].join('');
+                    document.getElementById('list').insertBefore(span, null);
+                    };
+                })(f);
+            }
+        }
+        
+    </script>
+</body>

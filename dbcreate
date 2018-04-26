@@ -1,0 +1,11 @@
+CREATE TABLE titles (
+    url varchar(64) NOT NULL,
+    title varchar(64) NOT NULL,
+    PRIMARY KEY (url)
+);
+CREATE TABLE images (
+    url varchar(64) NOT NULL,
+    data LONGBLOB NOT NULL,
+    num INT NOT NULL,
+    FOREIGN KEY (url) REFERENCES titles(url) 
+);
