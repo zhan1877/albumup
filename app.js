@@ -86,7 +86,7 @@ connect();
 //Shut down
 
 var shutdown_routine = function() {
-//    require('./kdb').disconnect();
+    con.end();
     console.log('Server shutdown');
     process.exit();
 };
